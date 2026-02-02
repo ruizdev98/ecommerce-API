@@ -1,4 +1,4 @@
-const Cart = require("../models/cart");
+const Cart = require("../models/Cart");
 
 // Obtener carrito del usuario
 async function getCart(req, res) {
