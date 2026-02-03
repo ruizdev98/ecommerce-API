@@ -7,18 +7,18 @@ console.log("NODE_ENV:", process.env.NODE_ENV);
 console.log("Usando SSL:", isProduction);
 
 const pool = new Pool({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
   connectionString: process.env.DATABASE_URL,
   ssl: isProduction ? { rejectUnauthorized: false } : false,
+  family: 4
 });
 
+pool.on("connect", () => {
+  console.log("✅ Conectado a PostgreSQL")
+})
+
 pool.on("error", (err) => {
-  console.error("Unexpected error on idle client", err);
-  process.exit(-1);
+  console.error("❌ Error inesperado en PostgreSQL", err);
+  process.exit(1);
 });
 
 module.exports = pool;
