@@ -75,29 +75,18 @@ const mercadopagoWebhook = async (req, res) => {
   try {
     const { type, data } = req.body
 
-    if (type !== "payment") {
-      return res.sendStatus(200)
-    }
-
-    if (!data?.id) {
-      console.warn("Webhook MP sin data.id", req.body)
+    if (type !== "payment" || !data?.id) {
       return res.sendStatus(200)
     }
 
     const payment = new Payment(client)
-    const paymentResponse = await payment.get({ id: data.id })
+    const paymentInfo = await payment.get({ id: data.id })
 
-    const paymentBody = paymentResponse?.body
+    // 👇 ESTE es el objeto correcto
+    const status = paymentInfo.status
+    const orderId = paymentInfo.external_reference
 
-    if (!paymentBody) {
-      console.warn("Payment body vacío", paymentResponse)
-      return res.sendStatus(200)
-    }
-
-    const status = paymentBody.status
-    const orderId = paymentBody.external_reference
-
-    console.log("Webhook MP:", {
+    console.log("Webhook MP OK:", {
       paymentId: data.id,
       status,
       orderId
@@ -110,7 +99,7 @@ const mercadopagoWebhook = async (req, res) => {
     res.sendStatus(200)
   } catch (error) {
     console.error("❌ Error webhook MP:", error)
-    res.sendStatus(200) // IMPORTANTE: siempre 200 para que MP no reintente infinito
+    res.sendStatus(200) // siempre 200
   }
 }
 
