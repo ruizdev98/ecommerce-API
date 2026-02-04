@@ -79,11 +79,23 @@ const mercadopagoWebhook = async (req, res) => {
       return res.sendStatus(200)
     }
 
-    const payment = new Payment(client)
-    const paymentInfo = await payment.get({ id: data.id })
+    if (!data?.id) {
+      console.warn("Webhook MP sin data.id", req.body)
+      return res.sendStatus(200)
+    }
 
-    const status = paymentInfo.body.status
-    const orderId = paymentInfo.body.external_reference
+    const payment = new Payment(client)
+    const paymentResponse = await payment.get({ id: data.id })
+
+    const paymentBody = paymentResponse?.body
+
+    if (!paymentBody) {
+      console.warn("Payment body vacío", paymentResponse)
+      return res.sendStatus(200)
+    }
+
+    const status = paymentBody.status
+    const orderId = paymentBody.external_reference
 
     console.log("Webhook MP:", {
       paymentId: data.id,
@@ -91,14 +103,14 @@ const mercadopagoWebhook = async (req, res) => {
       orderId
     })
 
-    if (status === "approved") {
+    if (status === "approved" && orderId) {
       await updateOrderStatus(orderId, "paid")
     }
 
     res.sendStatus(200)
   } catch (error) {
-    console.error("Error webhook MP:", error)
-    res.sendStatus(500)
+    console.error("❌ Error webhook MP:", error)
+    res.sendStatus(200) // IMPORTANTE: siempre 200 para que MP no reintente infinito
   }
 }
 
