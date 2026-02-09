@@ -75,27 +75,22 @@ const createMercadoPagoPreference = async (req, res) => {
 ================================ */
 const mercadopagoWebhook = async (req, res) => {
   try {
-    const { type, data } = req.body
+    console.log("📩 WEBHOOK RAW:", req.body)
 
-    if (type !== "payment" || !data?.id) {
-      return res.sendStatus(200)
-    }
+    const paymentId = req.body?.data?.id
+    if (!paymentId) return res.sendStatus(200)
 
     const payment = new Payment(client)
-    const paymentInfo = await payment.get({ id: data.id })
+    const paymentInfo = await payment.get({ id: paymentId })
 
-    // 👇 ESTE es el objeto correcto
     const status = paymentInfo.status
     const orderId = paymentInfo.external_reference
 
-    console.log("Webhook MP OK:", {
-      paymentId: data.id,
-      status,
-      orderId
-    })
+    console.log("💳 PAGO:", { status, orderId })
 
     if (status === "approved" && orderId) {
       await updateOrderStatus(orderId, "paid")
+      console.log("✅ ORDEN MARCADA COMO PAGADA")
     }
 
     res.sendStatus(200)
