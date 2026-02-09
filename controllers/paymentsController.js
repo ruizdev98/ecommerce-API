@@ -39,8 +39,9 @@ const createMercadoPagoPreference = async (req, res) => {
           failure: `${process.env.FRONTEND_URL}/checkout/failure`,
           pending: `${process.env.FRONTEND_URL}/checkout/pending`
         },
-        //auto_return: "approved", (en producción)
-        external_reference: String(order.id)
+        auto_return: "approved",
+        external_reference: String(order.id),
+        notification_url: `${process.env.BACKEND_URL}/webhooks/mercadopago`
       }
     })
 
