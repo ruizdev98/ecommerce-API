@@ -36,9 +36,9 @@ const createMercadoPagoPreference = async (req, res) => {
           }
         ],
         back_urls: {
-          success: `${process.env.FRONTEND_URL}/checkout/success`,
-          failure: `${process.env.FRONTEND_URL}/checkout/failure`,
-          pending: `${process.env.FRONTEND_URL}/checkout/pending`
+          success: `${process.env.FRONTEND_URL}/`,
+          failure: `${process.env.FRONTEND_URL}/`,
+          pending: `${process.env.FRONTEND_URL}/`
         },
         auto_return: "approved",
         external_reference: String(order.id),
