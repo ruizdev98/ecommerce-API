@@ -9,6 +9,7 @@ const createMercadoPagoPreference = async (req, res) => {
   try {
     console.log("FRONTEND_URL 👉", process.env.FRONTEND_URL)
     console.log("NODE_ENV 👉", process.env.NODE_ENV)
+    console.log("BACKEND_URL 👉", process.env.BACKEND_URL)
     
     const { orderId } = req.body
 
