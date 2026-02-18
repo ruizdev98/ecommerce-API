@@ -265,7 +265,15 @@ const savePaymentInfo = async ({ orderId, paymentId, paymentUrl }) => {
   await db.query(query, [paymentId, paymentUrl, orderId])
 }
 
+const getOrderByIdForWebhook = async (orderId) => {
+  const res = await db.query(`
+    SELECT id, user_id, status
+    FROM orders
+    WHERE id = $1
+  `, [orderId])
 
+  return res.rows[0] || null
+}
 
 module.exports = {
     createOrder,
@@ -274,5 +282,6 @@ module.exports = {
     updateOrderStatus,
     getPendingOrderByUser,
     cancelOrder,
-    savePaymentInfo
+    savePaymentInfo,
+    getOrderByIdForWebhook
 }

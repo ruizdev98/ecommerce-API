@@ -1,6 +1,6 @@
 const client = require("../config/mercadopago")
 const { Preference, Payment } = require("mercadopago")
-const { getOrderById, getOrderByIdForPayment, savePaymentInfo, updateOrderStatus } = require("../models/Order")
+const { getOrderByIdForWebhook, getOrderByIdForPayment, savePaymentInfo, updateOrderStatus } = require("../models/Order")
 const { replaceCartItems } = require("../models/Cart")
 
 /* ===============================
@@ -92,7 +92,7 @@ const mercadopagoWebhook = async (req, res) => {
     if (status === "approved" && orderId) {
       await updateOrderStatus(orderId, "paid")
 
-      const order = await getOrderById(orderId)
+      const order = await getOrderByIdForWebhook(orderId)
 
       if (order?.user_id) {
         await replaceCartItems(order.user_id, [])
