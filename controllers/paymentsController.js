@@ -42,7 +42,7 @@ const createMercadoPagoPreference = async (req, res) => {
         },
         auto_return: "approved",
         external_reference: String(order.id),
-        notification_url: `${process.env.BACKEND_URL}/webhooks/mercadopago`
+        notification_url: `${process.env.BACKEND_URL}/api/payments/webhooks/mercadopago`
       }
     })
 

@@ -6,6 +6,6 @@ const paymentsController = require("../controllers/paymentsController")
 router.post("/mercadopago", paymentsController.createMercadoPagoPreference)
 
 // 2️⃣ Webhook (Mercado Pago llama a esto)
-router.post("/webhook", paymentsController.mercadopagoWebhook)
+router.post("/webhooks/mercadopago", paymentsController.mercadopagoWebhook)
 
 module.exports = router
