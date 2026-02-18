@@ -1,6 +1,7 @@
 const client = require("../config/mercadopago")
 const { Preference, Payment } = require("mercadopago")
-const { getOrderByIdForPayment, savePaymentInfo, updateOrderStatus } = require("../models/Order")
+const { getOrderById, getOrderByIdForPayment, savePaymentInfo, updateOrderStatus } = require("../models/Order")
+const { replaceCartItems } = require("../models/Cart")
 
 /* ===============================
    CREAR PREFERENCIA DE PAGO
@@ -90,6 +91,14 @@ const mercadopagoWebhook = async (req, res) => {
 
     if (status === "approved" && orderId) {
       await updateOrderStatus(orderId, "paid")
+
+      const order = await getOrderById(orderId)
+
+      if (order?.user_id) {
+        await replaceCartItems(order.user_id, [])
+        console.log("🧹 CARRITO LIMPIADO EN BACKEND")
+      }
+
       console.log("✅ ORDEN MARCADA COMO PAGADA")
     }
 
