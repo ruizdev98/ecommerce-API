@@ -3,12 +3,8 @@ const Cart = require("../models/Cart");
 // Obtener carrito del usuario
 async function getCart(req, res) {
   try {
-    const { userId } = req.query;
-
-    // Validación básica
-    if (!userId) {
-      return res.status(400).json({ error: "Falta userId" });
-    }
+    // 🔥 userId desde Firebase
+    const userId = req.user.uid
 
     const result = await Cart.getUserCart(userId);
 
@@ -25,30 +21,31 @@ async function getCart(req, res) {
 // Reemplazar los items del carrito
 async function updateCart(req, res) {
   try {
-    const { userId, items } = req.body;
+    // 🔥 userId desde Firebase
+    const userId = req.user.uid
 
-    // Validación básica
-    if (!userId) {
-      return res.status(400).json({ error: "Falta userId" });
-    }
+    const { items } = req.body;
 
+    // Validación
     if (!Array.isArray(items)) {
       return res.status(400).json({ error: "items debe ser un array" });
     }
 
-    const result = await Cart.replaceCartItems(userId, items);
+    await Cart.replaceCartItems(userId, items);
+
+    // 🔥 devolver carrito actualizado
+    const updatedCart = await Cart.getUserCart(userId);
 
     return res.status(200).json({
       success: true,
       message: "Carrito actualizado correctamente",
-      cart: result,
+      cart: updatedCart,
     });
   } catch (err) {
     console.error("❌ Error en updateCart:", err);
     return res.status(500).json({
       error: "Error actualizando carrito",
-      detail: err.message,    // 👈 MOSTRAR MENSAJE REAL
-      stack: err.stack        // 👈 OPCIONAL (para debug)
+      detail: err.message,
     });
   }
 }
