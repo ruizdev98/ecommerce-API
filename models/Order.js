@@ -7,7 +7,6 @@ const { keysToCamelCase } = require("../utils/camelCase");
  * - orders
  * - order_shipping
  * - order_items
- * Todo en una transacción
  */
 const createOrder = async ({
     userId,
@@ -25,10 +24,7 @@ const createOrder = async ({
         /* ================= VALIDACIONES ================= */
 
         // 🔒 Validar cantidad total de productos
-        const calculatedTotalItems = items.reduce(
-            (acc, item) => acc + Number(item.quantity),
-            0
-        )
+        const calculatedTotalItems = items.reduce((acc, item) => acc + Number(item.quantity), 0)
 
         if (calculatedTotalItems <= 0) {
             throw new Error("La orden debe tener al menos un producto")
@@ -36,11 +32,9 @@ const createOrder = async ({
 
         /* ================= CREAR ORDEN ================= */
         const DELIVERY_COST = 10
-
         const deliveryCost = deliveryMethod === "home" ? DELIVERY_COST : 0
-
-        // 🔢 TOTAL FINAL (no confiar en frontend)
         const finalTotal = Number(totals.subtotal) - Number(totals.discount) + deliveryCost
+
         // 1️⃣ Crear orden
         const orderRes = await client.query(`
         INSERT INTO orders (
@@ -55,13 +49,13 @@ const createOrder = async ({
         VALUES ($1,$2,$3,$4,$5,$6,$7)
         RETURNING id
         `, [
-        userId,
-        deliveryMethod,
-        calculatedTotalItems,
-        totals.subtotal,
-        totals.discount,
-        deliveryCost,
-        finalTotal
+            userId,
+            deliveryMethod,
+            calculatedTotalItems,
+            totals.subtotal,
+            totals.discount,
+            deliveryCost,
+            finalTotal
         ])
 
         const orderId = orderRes.rows[0].id
@@ -74,15 +68,15 @@ const createOrder = async ({
 
         await client.query(`
             INSERT INTO order_shipping (
-            order_id,
-            name,
-            lastname,
-            document_type,
-            document_number,
-            phone,
-            ubigeo,
-            address,
-            reference
+                order_id,
+                name,
+                lastname,
+                document_type,
+                document_number,
+                phone,
+                ubigeo,
+                address,
+                reference
             )
             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
         `, [
@@ -99,28 +93,48 @@ const createOrder = async ({
         }
 
         // 3️⃣ Items
+        // 🔥 1. Obtener todos los product_id de una sola vez
+        const variantIds = items.map(i => Number(i.variantId))
+
+        const variantsRes = await client.query(
+            `SELECT id, product_id FROM product_variants WHERE id = ANY($1)`,
+            [variantIds]
+        )
+
+        if (variantsRes.rows.length !== variantIds.length) {
+            throw new Error("Algunos variants no existen")
+        }
+        
+        const variantMap = {}
+        variantsRes.rows.forEach(v => {
+            variantMap[v.id] = v.product_id
+        })
+
         for (const item of items) {
-            console.log("🧪 ITEM RECIBIDO EN BACKEND:", item)
+            const productId = variantMap[item.variantId]
+            if (!productId) {
+                throw new Error(`Variant inválido: ${item.variantId}`)
+            }
         await client.query(`
             INSERT INTO order_items (
-            order_id,
-            product_id,
-            variant_id,
-            product_name,
-            price,
-            quantity,
-            total
+                order_id,
+                product_id,
+                variant_id,
+                product_name,
+                price,
+                quantity,
+                total
             )
             VALUES ($1,$2,$3,$4,$5,$6,$7)
-        `, [
-            orderId,
-            Number(item.productId),     // 🔑 ESTE FALTABA
-            Number(item.variantId),
-            item.productName,
-            Number(item.unitPrice),
-            Number(item.quantity),
-            Number(item.total)
-        ])
+            `, [
+                orderId,
+                productId,     // 🔑 ESTE FALTABA
+                Number(item.variantId),
+                item.productName,
+                Number(item.unitPrice),
+                Number(item.quantity),
+                Number(item.total)
+            ])
         }
 
         await client.query("COMMIT")
@@ -128,6 +142,7 @@ const createOrder = async ({
 
     } catch (error) {
         await client.query("ROLLBACK")
+        console.error("❌ Error en createOrder:", error)
         throw error
     } finally {
         client.release()

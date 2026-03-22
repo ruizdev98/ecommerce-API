@@ -91,14 +91,26 @@
 
       // 4. Insertar nuevos items
       for (const entry of Object.values(normalized)) {
+        // 🔍 Obtener product_id desde variant_id
+        const variantRes = await client.query(
+          `SELECT product_id FROM product_variants WHERE id = $1`,
+          [entry.variantId]
+        )
+
+        if (variantRes.rows.length === 0) {
+          throw new Error(`Variant no encontrado: ${entry.variantId}`)
+        }
+
+        const productId = variantRes.rows[0].product_id
+
         await client.query(
           `
-          INSERT INTO cart_items (cart_id, variant_id, quantity)
-          VALUES ($1, $2, $3)
+          INSERT INTO cart_items (cart_id, product_id, variant_id, quantity)
+          VALUES ($1, $2, $3, $4)
           ON CONFLICT (cart_id, variant_id)
           DO UPDATE SET quantity = EXCLUDED.quantity;
           `,
-          [cart.id, entry.variantId, entry.quantity]
+          [cart.id, productId, entry.variantId, entry.quantity]
         );
       }
 
