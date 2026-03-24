@@ -55,7 +55,6 @@ async function getProductById(req, res) {
 async function getByCategory(req, res) {
   try {
     const { categoryId } = req.params
-    console.log("categoryId recibido:", categoryId)
     const products = await productModel.findByCategory(categoryId)
     res.json(products)
   } catch (error) {
