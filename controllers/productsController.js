@@ -59,7 +59,7 @@ async function getByCategory(req, res) {
     res.json(products)
   } catch (error) {
     console.error("🔥 ERROR REAL:", error) // 👈 CLAVE
-    res.status(500).json({ error: "Internal server error" })
+    res.status(500).json({ error: error.message })
   }
 }
 
