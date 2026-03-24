@@ -52,10 +52,23 @@ async function getProductById(req, res) {
   }
 }
 
+async function getByCategory(req, res) {
+  try {
+    const { categoryId } = req.params
+    const products = await productModel.findByCategory(categoryId)
+    res.json(products)
+  } catch (error) {
+    console.error("Error getting products by category:", error)
+    res.status(500).json({ error: "Internal server error" })
+  }
+}
+
+
 module.exports = {
   getAllProducts,
   getBestSellerProducts,
   getFeaturedProducts,
   getOfferProducts,
   getProductById,
+  getByCategory
 };

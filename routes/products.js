@@ -8,5 +8,6 @@ router.get("/bestsellers", productsController.getBestSellerProducts);
 router.get("/featured", productsController.getFeaturedProducts);
 router.get("/offers", productsController.getOfferProducts);
 router.get("/:id", productsController.getProductById);
+router.get("/:categoryId", productsController.getByCategory)
 
 module.exports = router;

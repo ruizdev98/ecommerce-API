@@ -52,10 +52,23 @@ async function findById(id) {
   return rows[0] || null; // devolver null si no existe
 }
 
+async function findByCategory(categoryId) {
+  const result = await pool.query(`
+    SELECT p.*, b.name AS brand_name, c.name AS category_name
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    INNER JOIN categories c ON p.category_id = c.id
+    WHERE p.category_id = $1
+  `, [categoryId])
+
+  return keysToCamelCase(result.rows)
+}
+
 module.exports = {
   findAll,
   findBestSellers,
   findFeatured,
   findOffers,
   findById,
+  findByCategory,
 };
