@@ -55,10 +55,11 @@ async function getProductById(req, res) {
 async function getByCategory(req, res) {
   try {
     const { categoryId } = req.params
+    console.log("categoryId recibido:", categoryId)
     const products = await productModel.findByCategory(categoryId)
     res.json(products)
   } catch (error) {
-    console.error("Error getting products by category:", error)
+    console.error("🔥 ERROR REAL:", error) // 👈 CLAVE
     res.status(500).json({ error: "Internal server error" })
   }
 }

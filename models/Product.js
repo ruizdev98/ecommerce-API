@@ -53,16 +53,20 @@ async function findById(id) {
 }
 
 async function findByCategory(categoryId) {
-  const categoryIdInt = parseInt(categoryId)
-  const result = await pool.query(`
-    SELECT p.*, b.name AS brand_name, c.name AS category_name
-    FROM products p
-    INNER JOIN brands b ON p.brand_id = b.id
-    INNER JOIN categories c ON p.category_id = c.id
-    WHERE p.category_id = $1
-  `, [categoryIdInt])
-
-  return keysToCamelCase(result.rows)
+  try {
+    const categoryIdInt = parseInt(categoryId)
+    console.log("categoryId convertido:", categoryIdInt)
+    const result = await pool.query(`
+      SELECT p.*, b.name AS brand_name
+      FROM products p
+      INNER JOIN brands b ON p.brand_id = b.id
+      WHERE p.category_id = $1
+    `, [categoryIdInt])
+    return keysToCamelCase(result.rows)
+  } catch (error) {
+    console.error("🔥 ERROR SQL:", error) // 👈 ESTE TE DIRÁ TODO
+    throw error
+  }
 }
 
 module.exports = {
