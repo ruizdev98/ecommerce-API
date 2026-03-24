@@ -55,7 +55,7 @@ async function getProductById(req, res) {
 async function getByCategory(req, res) {
   try {
     const { categoryId } = req.params
-    const products = await productModel.findByCategory(categoryId)
+    const products = await Product.findByCategory(categoryId)
     res.json(products)
   } catch (error) {
     console.error("🔥 ERROR REAL:", error) // 👈 CLAVE
