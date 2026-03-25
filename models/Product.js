@@ -110,7 +110,9 @@ async function getFilters(categoryId) {
     WHERE p.category_id = $1
   `, [categoryId])
 
-  return keysToCamelCase(result.rows)
+  return {
+    brands: keysToCamelCase(result.rows.map(r => r.brand_name))
+  }
 }
 
 module.exports = {
