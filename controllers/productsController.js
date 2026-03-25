@@ -63,6 +63,23 @@ async function getByCategory(req, res) {
   }
 }
 
+async function getProducts(req, res) {
+  try {
+    const { category, brand, minPrice, maxPrice } = req.query
+
+    const products = await Product.findWithFilters({
+      categoryId: category,
+      brand,
+      minPrice,
+      maxPrice
+    })
+
+    res.json(products)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: "Internal server error" })
+  }
+}
 
 module.exports = {
   getAllProducts,
@@ -70,5 +87,6 @@ module.exports = {
   getFeaturedProducts,
   getOfferProducts,
   getProductById,
-  getByCategory
+  getByCategory,
+  getProducts
 };

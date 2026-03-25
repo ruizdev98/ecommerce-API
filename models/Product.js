@@ -68,6 +68,40 @@ async function findByCategory(categoryId) {
   return keysToCamelCase(result.rows)
 }
 
+async function findWithFilters({ categoryId, brand, minPrice, maxPrice }) {
+  let query = `
+    SELECT p.*, b.name AS brand_name
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    WHERE 1=1
+  `
+  const values = []
+  let index = 1
+
+  if (categoryId) {
+    query += ` AND p.category_id = $${index++}`
+    values.push(categoryId)
+  }
+
+  if (brand) {
+    query += ` AND b.name = $${index++}`
+    values.push(brand)
+  }
+
+  if (minPrice) {
+    query += ` AND p.price >= $${index++}`
+    values.push(minPrice)
+  }
+
+  if (maxPrice) {
+    query += ` AND p.price <= $${index++}`
+    values.push(maxPrice)
+  }
+
+  const result = await pool.query(query, values)
+  return keysToCamelCase(result.rows)
+}
+
 module.exports = {
   findAll,
   findBestSellers,
@@ -75,4 +109,5 @@ module.exports = {
   findOffers,
   findById,
   findByCategory,
+  findWithFilters
 };
