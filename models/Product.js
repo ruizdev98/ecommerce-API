@@ -102,6 +102,17 @@ async function findWithFilters({ categoryId, brand, minPrice, maxPrice }) {
   return keysToCamelCase(result.rows)
 }
 
+async function getFilters(categoryId) {
+  const result = await pool.query(`
+    SELECT DISTINCT b.name AS brand_name
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    WHERE p.category_id = $1
+  `, [categoryId])
+
+  return result.rows
+}
+
 module.exports = {
   findAll,
   findBestSellers,
@@ -109,5 +120,6 @@ module.exports = {
   findOffers,
   findById,
   findByCategory,
-  findWithFilters
+  findWithFilters,
+  getFilters
 };

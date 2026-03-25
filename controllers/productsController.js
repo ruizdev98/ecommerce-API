@@ -81,6 +81,19 @@ async function getProducts(req, res) {
   }
 }
 
+async function getProductFilters(req, res) {
+  try {
+    const { category } = req.query
+
+    const filters = await Product.getFilters(category)
+
+    res.json(filters)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: "Internal server error" })
+  }
+}
+
 module.exports = {
   getAllProducts,
   getBestSellerProducts,
@@ -88,5 +101,6 @@ module.exports = {
   getOfferProducts,
   getProductById,
   getByCategory,
-  getProducts
+  getProducts,
+  getProductFilters
 };
