@@ -7,7 +7,7 @@ router.get("/", productsController.getProducts);
 router.get("/bestsellers", productsController.getBestSellerProducts);
 router.get("/featured", productsController.getFeaturedProducts);
 router.get("/offers", productsController.getOfferProducts);
+router.get("/filters", productsController.getProductFilters);
 router.get("/:id", productsController.getProductById);
-router.get("/filters", productsController.getProductFilters)
 
 module.exports = router;
