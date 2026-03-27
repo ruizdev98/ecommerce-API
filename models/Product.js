@@ -70,9 +70,10 @@ async function findByCategory(categoryId) {
 
 async function findWithFilters({ categoryId, brand, minPrice, maxPrice }) {
   let query = `
-    SELECT p.*, b.name AS brand_name
+    SELECT p.*, b.name AS brand_name, c.name AS category_name
     FROM products p
     INNER JOIN brands b ON p.brand_id = b.id
+    INNER JOIN categories c ON p.category_id = c.id
     WHERE 1=1
   `
   const values = []
