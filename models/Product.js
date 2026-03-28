@@ -90,12 +90,12 @@ async function findWithFilters({ categoryId, brand, minPrice, maxPrice }) {
   }
 
   if (minPrice) {
-    query += ` AND p.price >= $${index++}`
+    query += ` AND COALESCE(p.discount_price, p.price) >= $${index++}`
     values.push(minPrice)
   }
 
   if (maxPrice) {
-    query += ` AND p.price <= $${index++}`
+    query += ` AND COALESCE(p.discount_price, p.price) <= $${index++}`
     values.push(maxPrice)
   }
 
