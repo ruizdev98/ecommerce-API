@@ -84,8 +84,8 @@ async function findWithFilters({ categoryId, brand, minPrice, maxPrice }) {
     values.push(categoryId)
   }
 
-  if (brand) {
-    query += ` AND b.name = $${index++}`
+  if (brand && brand.length > 0) {
+    query += ` AND b.name = ANY($${index++})`
     values.push(brand)
   }
 

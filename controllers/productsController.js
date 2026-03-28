@@ -65,7 +65,12 @@ async function getByCategory(req, res) {
 
 async function getProducts(req, res) {
   try {
-    const { category, brand, minPrice, maxPrice } = req.query
+    let { category, brand, minPrice, maxPrice } = req.query
+
+    // 🔥 convertir brand siempre a array
+    if (brand && !Array.isArray(brand)) {
+      brand = [brand]
+    }
 
     const products = await Product.findWithFilters({
       categoryId: category,
