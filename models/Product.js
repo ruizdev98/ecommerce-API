@@ -19,13 +19,34 @@ async function findBestSellers() {
   `);
   return keysToCamelCase(result.rows);
 }
-
+async function findBestSellersLimit8() {
+  const result = await pool.query(`
+    SELECT p.*, b.name AS brand_name
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    WHERE p.is_best_seller = true
+    ORDER BY p.discount_price ASC
+    LIMIT 8
+  `);
+  return keysToCamelCase(result.rows);
+}
 async function findFeatured() {
   const result = await pool.query(`
     SELECT p.*, b.name AS brand_name
     FROM products p
     INNER JOIN brands b ON p.brand_id = b.id
     WHERE p.is_featured = true
+  `);
+  return keysToCamelCase(result.rows);
+}
+async function findFeaturedLimit8() {
+  const result = await pool.query(`
+    SELECT p.*, b.name AS brand_name
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    WHERE p.is_featured = true
+    ORDER BY p.discount_price ASC
+    LIMIT 8
   `);
   return keysToCamelCase(result.rows);
 }
@@ -119,7 +140,9 @@ async function getFilters(categoryId) {
 module.exports = {
   findAll,
   findBestSellers,
+  findBestSellersLimit8,
   findFeatured,
+  findFeaturedLimit8,
   findOffers,
   findById,
   findByCategory,

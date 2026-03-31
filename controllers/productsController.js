@@ -20,6 +20,16 @@ async function getBestSellerProducts(req, res) {
   }
 }
 
+async function getBestSellerProductsLimit8(req, res) {
+  try {
+    const products = await Product.findBestSellersLimit8();
+    res.json(products);
+  } catch (error) {
+    console.error("Error al obtener los 8 productos más vendidos:", error);
+    res.status(500).json({ error: "Error al obtener los 8 productos más vendidos" });
+  }
+}
+
 async function getFeaturedProducts(req, res) {
   try {
     const products = await Product.findFeatured();
@@ -27,6 +37,16 @@ async function getFeaturedProducts(req, res) {
   } catch (error) {
     console.error("Error al obtener productos destacados:", error);
     res.status(500).json({ error: "Error al obtener productos destacados" });
+  }
+}
+
+async function getFeaturedProductsLimit8(req, res) {
+  try {
+    const products = await Product.findFeaturedLimit8();
+    res.json(products);
+  } catch (error) {
+    console.error("Error al obtener los 8 productos más destacados:", error);
+    res.status(500).json({ error: "Error al obtener los 8 productos más destacados" });
   }
 }
 
@@ -102,7 +122,9 @@ async function getProductFilters(req, res) {
 module.exports = {
   getAllProducts,
   getBestSellerProducts,
+  getBestSellerProductsLimit8,
   getFeaturedProducts,
+  getFeaturedProductsLimit8,
   getOfferProducts,
   getProductById,
   getByCategory,
