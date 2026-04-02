@@ -10,56 +10,6 @@ async function getAllProducts(req, res) {
   }
 }
 
-async function getBestSellerProducts(req, res) {
-  try {
-    const products = await Product.findBestSellers();
-    res.json(products);
-  } catch (error) {
-    console.error("Error al obtener productos más vendidos:", error);
-    res.status(500).json({ error: "Error al obtener productos más vendidos" });
-  }
-}
-
-async function getBestSellerProductsLimit8(req, res) {
-  try {
-    const products = await Product.findBestSellersLimit8();
-    res.json(products);
-  } catch (error) {
-    console.error("Error al obtener los 8 productos más vendidos:", error);
-    res.status(500).json({ error: "Error al obtener los 8 productos más vendidos" });
-  }
-}
-
-async function getFeaturedProducts(req, res) {
-  try {
-    const products = await Product.findFeatured();
-    res.json(products);
-  } catch (error) {
-    console.error("Error al obtener productos destacados:", error);
-    res.status(500).json({ error: "Error al obtener productos destacados" });
-  }
-}
-
-async function getFeaturedProductsLimit8(req, res) {
-  try {
-    const products = await Product.findFeaturedLimit8();
-    res.json(products);
-  } catch (error) {
-    console.error("Error al obtener los 8 productos más destacados:", error);
-    res.status(500).json({ error: "Error al obtener los 8 productos más destacados" });
-  }
-}
-
-async function getOfferProducts(req, res) {
-  try {
-    const products = await Product.findOffers();
-    res.json(products);
-  } catch (error) {
-    console.error("Error al obtener productos destacados:", error);
-    res.status(500).json({ error: "Error al obtener productos destacados" });
-  }
-}
-
 async function getProductById(req, res) {
   try {
     const { id } = req.params;
@@ -72,62 +22,35 @@ async function getProductById(req, res) {
   }
 }
 
-async function getByCategory(req, res) {
-  try {
-    const { categoryId } = req.params
-    const products = await Product.findByCategory(categoryId)
-    res.json(products)
-  } catch (error) {
-    console.error("🔥 ERROR REAL:", error) // 👈 CLAVE
-    res.status(500).json({ error: error.message })
-  }
-}
-
 async function getProducts(req, res) {
   try {
-    let { category, brand, minPrice, maxPrice } = req.query
+    let { category, brand, minPrice, maxPrice, bestSeller, featured, offer, limit } = req.query
 
-    // 🔥 convertir brand siempre a array
+    // 🔥 convertir brand a array
     if (brand && !Array.isArray(brand)) {
       brand = [brand]
     }
 
-    const products = await Product.findWithFilters({
+    const products = await Product.findProducts({
       categoryId: category,
       brand,
       minPrice,
-      maxPrice
+      maxPrice,
+      bestSeller: bestSeller === "true",
+      featured: featured === "true",
+      offer: offer === "true",
+      limit: limit ? parseInt(limit) : undefined
     })
 
     res.json(products)
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: "Internal server error" })
-  }
-}
-
-async function getProductFilters(req, res) {
-  try {
-    const { category } = req.query
-
-    const filters = await Product.getFilters(category)
-
-    res.json(filters)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: "Internal server error" })
+    console.error("Error al obtener productos:", error)
+    res.status(500).json({ error: "Error al obtener productos" })
   }
 }
 
 module.exports = {
   getAllProducts,
-  getBestSellerProducts,
-  getBestSellerProductsLimit8,
-  getFeaturedProducts,
-  getFeaturedProductsLimit8,
-  getOfferProducts,
   getProductById,
-  getByCategory,
   getProducts,
-  getProductFilters
 };
