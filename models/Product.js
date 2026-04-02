@@ -125,5 +125,7 @@ async function findProducts({
 module.exports = {
   findAll,
   findById,
-  findProducts,
+  findByCategory,
+  getFilters,
+  findProducts
 };

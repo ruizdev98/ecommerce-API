@@ -22,6 +22,17 @@ async function getProductById(req, res) {
   }
 }
 
+async function getByCategory(req, res) {
+  try {
+    const { categoryId } = req.params
+    const products = await Product.findByCategory(categoryId)
+    res.json(products)
+  } catch (error) {
+    console.error("🔥 ERROR REAL:", error) // 👈 CLAVE
+    res.status(500).json({ error: error.message })
+  }
+}
+
 async function getProducts(req, res) {
   try {
     let { category, brand, minPrice, maxPrice, bestSeller, featured, offer, limit } = req.query
@@ -49,8 +60,23 @@ async function getProducts(req, res) {
   }
 }
 
+async function getProductFilters(req, res) {
+  try {
+    const { category } = req.query
+
+    const filters = await Product.getFilters(category)
+
+    res.json(filters)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: "Internal server error" })
+  }
+}
+
 module.exports = {
   getAllProducts,
   getProductById,
+  getByCategory,
   getProducts,
+  getProductFilters
 };
