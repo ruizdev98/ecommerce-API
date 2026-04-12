@@ -43,7 +43,8 @@ async function getProducts(req, res) {
       bestSeller, 
       featured, 
       offer, 
-      gender, 
+      gender,
+      search,
       limit 
     } = req.query
 
@@ -61,6 +62,7 @@ async function getProducts(req, res) {
       featured: featured === "true",
       offer: offer === "true",
       genderId: gender,
+      search,
       limit: limit ? parseInt(limit) : undefined
     })
     res.json(products)

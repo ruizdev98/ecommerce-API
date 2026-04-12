@@ -60,6 +60,7 @@ async function findProducts({
   featured,
   offer,
   genderId,
+  search,
   limit
 }) {
   let query = `
@@ -89,6 +90,16 @@ async function findProducts({
       query += ` AND p.gender_id = $${index++}`
       values.push(genderIdInt)
     }
+  }
+  // 🔥 SEARCH
+  if (search) {
+    query += ` AND (
+      LOWER(p.name) LIKE LOWER($${index})
+      OR LOWER(b.name) LIKE LOWER($${index})
+      OR LOWER(c.name) LIKE LOWER($${index})
+    )`
+    values.push(`%${search}%`)
+    index++
   }
 
   // 🔥 BRAND
