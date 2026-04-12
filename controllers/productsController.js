@@ -35,7 +35,17 @@ async function getByCategory(req, res) {
 
 async function getProducts(req, res) {
   try {
-    let { category, brand, minPrice, maxPrice, bestSeller, featured, offer, limit } = req.query
+    let { 
+      category, 
+      brand, 
+      minPrice,
+      maxPrice, 
+      bestSeller, 
+      featured, 
+      offer, 
+      gender, 
+      limit 
+    } = req.query
 
     // 🔥 convertir brand a array
     if (brand && !Array.isArray(brand)) {
@@ -50,9 +60,9 @@ async function getProducts(req, res) {
       bestSeller: bestSeller === "true",
       featured: featured === "true",
       offer: offer === "true",
+      genderId: gender,
       limit: limit ? parseInt(limit) : undefined
     })
-
     res.json(products)
   } catch (error) {
     console.error("Error al obtener productos:", error)

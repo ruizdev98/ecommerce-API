@@ -59,6 +59,7 @@ async function findProducts({
   bestSeller,
   featured,
   offer,
+  genderId,
   limit
 }) {
   let query = `
@@ -74,11 +75,23 @@ async function findProducts({
 
   // 🔥 CATEGORY
   if (categoryId) {
-    query += ` AND p.category_id = $${index++}`
-    values.push(categoryId)
+    const categoryIdInt = parseInt(categoryId)
+    if (!isNaN(categoryIdInt)) {
+      query += ` AND p.category_id = $${index++}`
+      values.push(categoryIdInt)
+    }
   }
 
-  // 🔥 BRAND (array)
+  // 🔥 GENDER
+  if (genderId) {
+    const genderIdInt = parseInt(genderId)
+    if (!isNaN(genderIdInt)) {
+      query += ` AND p.gender_id = $${index++}`
+      values.push(genderIdInt)
+    }
+  }
+
+  // 🔥 BRAND
   if (brand && brand.length > 0) {
     query += ` AND b.name = ANY($${index++})`
     values.push(brand)
@@ -95,27 +108,18 @@ async function findProducts({
     values.push(maxPrice)
   }
 
-  // 🔥 BEST SELLER
-  if (bestSeller === true) {
-    query += ` AND p.is_best_seller = true`
-  }
-
-  // 🔥 FEATURED
-  if (featured === true) {
-    query += ` AND p.is_featured = true`
-  }
-
-  // 🔥 OFFERS
-  if (offer === true) {
-    query += ` AND p.is_offer = true`
-  }
+  // 🔥 FLAGS
+  if (bestSeller === true) query += ` AND p.is_best_seller = true`
+  if (featured === true) query += ` AND p.is_featured = true`
+  if (offer === true) query += ` AND p.is_offer = true`
 
   // 🔥 ORDEN
-  query += ` ORDER BY p.id DESC`
+  query += ` ORDER BY COALESCE(p.discount_price, p.price) ASC`
 
-  // 🔥 LIMIT
+  // 🔥 LIMIT SEGURO
   if (limit) {
-    query += ` LIMIT ${limit}`
+    query += ` LIMIT $${index++}`
+    values.push(limit)
   }
 
   const result = await pool.query(query, values)
